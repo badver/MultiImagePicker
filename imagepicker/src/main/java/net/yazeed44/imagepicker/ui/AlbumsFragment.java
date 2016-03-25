@@ -177,27 +177,41 @@ public class AlbumsFragment extends Fragment implements RequestListener<ArrayLis
         boolean hitLimit = false;
         for (AlbumEntry albumEntry : mAlbumList) {
 
-            if (PickerActivity.sCheckedImages.size() < mPickOptions.limit || mPickOptions.limit == PickerActivity.NO_LIMIT) {
-
-                for (final ImageEntry imageEntry : albumEntry.imageList) {
-
-                    if (mPickOptions.limit != PickerActivity.NO_LIMIT && PickerActivity.sCheckedImages.size() + 1 > mPickOptions.limit) {
-                        hitLimit = true;
-                        break;
-                    }
-
-                    imageEntry.isPicked = imagePaths.contains(imageEntry.path);
-
-                    if (imageEntry.isPicked && !PickerActivity.sCheckedImages.contains(imageEntry)) {
-                        //To avoid repeated images
-                        PickerActivity.sCheckedImages.add(imageEntry);
-                    }
+            boolean hasDefaultPickedImage = false;
+            for (String path : imagePaths) {
+                if (path.contains(albumEntry.name)) {
+                    hasDefaultPickedImage = true;
+                    break;
                 }
             }
-            if (hitLimit) {
-                break;
+
+            if (hasDefaultPickedImage) {
+                if (PickerActivity.sCheckedImages.size() < mPickOptions.limit || mPickOptions.limit == PickerActivity.NO_LIMIT) {
+
+                    for (final ImageEntry imageEntry : albumEntry.imageList) {
+
+                        if (mPickOptions.limit != PickerActivity.NO_LIMIT && PickerActivity.sCheckedImages.size() + 1 > mPickOptions.limit) {
+                            hitLimit = true;
+                            break;
+                        }
+
+                        if (imagePaths.contains(imageEntry.path)) {
+                            imageEntry.isPicked = true;
+
+                            if (!PickerActivity.sCheckedImages.contains(imageEntry)) {
+                                //To avoid repeated images
+                                PickerActivity.sCheckedImages.add(imageEntry);
+                            }
+                        }
+                    }
+                } else hitLimit = true;
+
+                if (hitLimit) {
+                    break;
+                }
             }
         }
+
         ((PickerActivity) getActivity()).updateFab();
 
     }
