@@ -198,7 +198,6 @@ public class AlbumsFragment extends Fragment implements RequestListener<ArrayLis
                 break;
             }
         }
-        EventBus.getDefault().post(new Events.OnUpdateImagesThumbnailEvent());
         ((PickerActivity) getActivity()).updateFab();
 
     }
