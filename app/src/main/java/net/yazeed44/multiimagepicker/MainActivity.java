@@ -72,8 +72,12 @@ public class MainActivity extends AppCompatActivity implements Picker.PickListen
     }
 
     public void onPickImageMultipleInfinite(View view) {
+        ArrayList<String> pickedImages = new ArrayList<String>();
+        pickedImages.add("/storage/sdcard0/Connectly/a6821dba9c4b529a924dd85e354546b0.jpg");
+        pickedImages.add("/storage/sdcard0/MeraCRM/global nap.jpg");
         new Picker.Builder(this, this, R.style.MIP_theme)
                 .setPickMode(Picker.PickMode.MULTIPLE_IMAGES)
+                .setDefaultPickedImages(pickedImages)
                 .build()
                 .startActivity();
 
@@ -125,10 +129,6 @@ public class MainActivity extends AppCompatActivity implements Picker.PickListen
 
 
     }
-
-
-
-
 
 
     @Override

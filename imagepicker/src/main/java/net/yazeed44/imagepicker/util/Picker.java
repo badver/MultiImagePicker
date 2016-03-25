@@ -48,6 +48,7 @@ public final class Picker {
     public final int videoThumbnailOverlayColor;
     public final int videoIconTintColor;
     public final boolean backBtnInMainActivity;
+    public final ArrayList<String> defaultPickedImages;
 
     private Picker(final Builder builder) {
         context = builder.mContext;
@@ -74,7 +75,7 @@ public final class Picker {
         videoThumbnailOverlayColor = builder.mVideoThumbnailOverlayColor;
         videoIconTintColor = builder.mVideoIconTintColor;
         backBtnInMainActivity = builder.mBackBtnInMainActivity;
-
+        defaultPickedImages = builder.defaultPickedImages;
     }
 
     public void startActivity() {
@@ -126,6 +127,7 @@ public final class Picker {
         private int mVideoThumbnailOverlayColor;
         private int mVideoIconTintColor;
         private boolean mBackBtnInMainActivity;
+        private ArrayList<String> defaultPickedImages;
 
         //Use (Context,PickListener,themeResId) instead
         @Deprecated
@@ -293,6 +295,11 @@ public final class Picker {
 
         public Picker.Builder setVideoIconTintColor(@ColorInt final int color) {
             mVideoIconTintColor = color;
+            return this;
+        }
+
+        public Picker.Builder setDefaultPickedImages(ArrayList<String> imagePaths) {
+            this.defaultPickedImages = imagePaths;
             return this;
         }
 

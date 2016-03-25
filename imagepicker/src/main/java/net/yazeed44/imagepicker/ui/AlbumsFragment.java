@@ -16,6 +16,7 @@ import com.octo.android.robospice.request.listener.RequestListener;
 
 import net.yazeed44.imagepicker.library.R;
 import net.yazeed44.imagepicker.model.AlbumEntry;
+import net.yazeed44.imagepicker.model.ImageEntry;
 import net.yazeed44.imagepicker.util.Events;
 import net.yazeed44.imagepicker.util.LoadingAlbumsRequest;
 import net.yazeed44.imagepicker.util.OfflineSpiceService;
@@ -96,6 +97,8 @@ public class AlbumsFragment extends Fragment implements RequestListener<ArrayLis
             final AlbumsAdapter albumsAdapter = new AlbumsAdapter(this, albumEntries, mAlbumsRecycler);
             mAlbumsRecycler.setAdapter(albumsAdapter);
 
+            setDefaultPickedImages();
+
             EventBus.getDefault().postSticky(new Events.OnAlbumsLoadedEvent(mAlbumList));
 
 
@@ -155,13 +158,48 @@ public class AlbumsFragment extends Fragment implements RequestListener<ArrayLis
     }
 
     private void pickLatestCapturedImage() {
-            for (final AlbumEntry albumEntry : mAlbumList) {
-                if (albumEntry.name.equals(PickerActivity.CAPTURED_IMAGES_ALBUM_NAME)) {
-                    EventBus.getDefault().postSticky(new Events.OnPickImageEvent(Util.getAllPhotosAlbum(mAlbumList).imageList.get(0)));
-                    mAlbumsRecycler.getChildAt(mAlbumList.indexOf(albumEntry)).performClick();
+        for (final AlbumEntry albumEntry : mAlbumList) {
+            if (albumEntry.name.equals(PickerActivity.CAPTURED_IMAGES_ALBUM_NAME)) {
+                EventBus.getDefault().postSticky(new Events.OnPickImageEvent(Util.getAllPhotosAlbum(mAlbumList).imageList.get(0)));
+                mAlbumsRecycler.getChildAt(mAlbumList.indexOf(albumEntry)).performClick();
+            }
+        }
+
+
+    }
+
+    private void setDefaultPickedImages() {
+        ArrayList<String> imagePaths = mPickOptions.defaultPickedImages;
+        if (imagePaths == null || imagePaths.isEmpty()) {
+            return;
+        }
+
+        boolean hitLimit = false;
+        for (AlbumEntry albumEntry : mAlbumList) {
+
+            if (PickerActivity.sCheckedImages.size() < mPickOptions.limit || mPickOptions.limit == PickerActivity.NO_LIMIT) {
+
+                for (final ImageEntry imageEntry : albumEntry.imageList) {
+
+                    if (mPickOptions.limit != PickerActivity.NO_LIMIT && PickerActivity.sCheckedImages.size() + 1 > mPickOptions.limit) {
+                        hitLimit = true;
+                        break;
+                    }
+
+                    imageEntry.isPicked = imagePaths.contains(imageEntry.path);
+
+                    if (imageEntry.isPicked && !PickerActivity.sCheckedImages.contains(imageEntry)) {
+                        //To avoid repeated images
+                        PickerActivity.sCheckedImages.add(imageEntry);
+                    }
                 }
             }
-
+            if (hitLimit) {
+                break;
+            }
+        }
+        EventBus.getDefault().post(new Events.OnUpdateImagesThumbnailEvent());
+        ((PickerActivity) getActivity()).updateFab();
 
     }
 
