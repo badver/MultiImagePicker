@@ -42,6 +42,7 @@ public final class Picker {
     public final int captureItemIconTintColor;
     public final int doneFabIconTintColor;
     public final boolean shouldShowCaptureMenuItem;
+    public final boolean shouldShowSelectAllMenuItem;
     public final int checkIconTintColor;
     public final boolean videosEnabled;
     public final int videoLengthLimit;
@@ -69,6 +70,7 @@ public final class Picker {
         captureItemIconTintColor = builder.mCaptureItemIconTintColor;
         doneFabIconTintColor = builder.mDoneFabIconTintColor;
         shouldShowCaptureMenuItem = builder.mShouldShowCaptureMenuItem;
+        shouldShowSelectAllMenuItem = builder.mShouldShowSelectAllMenuItem;
         checkIconTintColor = builder.mCheckIconTintColor;
         videosEnabled = builder.mVideosEnabled;
         videoLengthLimit = builder.mVideoLengthLimit;
@@ -121,6 +123,7 @@ public final class Picker {
         private int mDoneFabIconTintColor;
         private int mCaptureItemIconTintColor;
         private boolean mShouldShowCaptureMenuItem;
+        private boolean mShouldShowSelectAllMenuItem;
         private int mCheckIconTintColor;
         private boolean mVideosEnabled;
         private int mVideoLengthLimit;
@@ -169,6 +172,7 @@ public final class Picker {
             mCaptureItemIconTintColor = mDoneFabIconTintColor = Util.getDefaultIconTintColor(mContext);
 
             mShouldShowCaptureMenuItem = true;
+            mShouldShowSelectAllMenuItem =true;
 
             mCheckIconTintColor = Color.WHITE;
             mVideosEnabled = false;
@@ -265,6 +269,11 @@ public final class Picker {
 
         public Picker.Builder disableCaptureImageFromCamera() {
             mShouldShowCaptureMenuItem = false;
+            return this;
+        }
+
+        public Picker.Builder disableSelectAllOption() {
+            mShouldShowSelectAllMenuItem = false;
             return this;
         }
 

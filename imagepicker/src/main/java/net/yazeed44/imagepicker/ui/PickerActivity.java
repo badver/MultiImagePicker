@@ -331,27 +331,25 @@ public class PickerActivity extends AppCompatActivity {
             initCaptureMenuItem(menu);
         }
 
-        getMenuInflater().inflate(R.menu.menu_select_all, menu);
-        getMenuInflater().inflate(R.menu.menu_deselect_all, menu);
+        if (mPickOptions.shouldShowSelectAllMenuItem) {
+            getMenuInflater().inflate(R.menu.menu_select_all, menu);
+            getMenuInflater().inflate(R.menu.menu_deselect_all, menu);
 
+            mSelectAllMenuItem = menu.findItem(R.id.action_select_all);
+            mDeselectAllMenuItem = menu.findItem(R.id.action_deselect_all);
 
+            if (shouldShowDeselectAll()) {
+                showDeselectAll();
+            } else {
+                hideDeselectAll();
+            }
 
-
-        mSelectAllMenuItem = menu.findItem(R.id.action_select_all);
-        mDeselectAllMenuItem = menu.findItem(R.id.action_deselect_all);
-
-        if (shouldShowDeselectAll()) {
-            showDeselectAll();
-        } else {
-            hideDeselectAll();
+            if (shouldShowSelectAll()) {
+                showSelectAll();
+            } else {
+                hideSelectAll();
+            }
         }
-
-        if (shouldShowSelectAll()) {
-            showSelectAll();
-        } else {
-            hideSelectAll();
-        }
-
 
         return true;
     }
