@@ -384,11 +384,14 @@ public class PickerActivity extends AppCompatActivity {
     }
 
     private void hideDeselectAll() {
+        if (mDeselectAllMenuItem == null) return;
+
         mDeselectAllMenuItem.setVisible(false);
 
     }
 
     private void showDeselectAll() {
+        if (mDeselectAllMenuItem == null) return;
 
         if (mPickOptions.pickMode == Picker.PickMode.SINGLE_IMAGE) {
             return;
@@ -527,11 +530,15 @@ public class PickerActivity extends AppCompatActivity {
     }
 
     private void hideSelectAll() {
+        if (mSelectAllMenuItem == null) return;
+
         mSelectAllMenuItem.setVisible(false);
 
     }
 
     private void showSelectAll() {
+        if (mSelectAllMenuItem == null) return;
+
         if (mPickOptions.pickMode == Picker.PickMode.SINGLE_IMAGE) {
             //Keep it hidden
             return;
