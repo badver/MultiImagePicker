@@ -1,0 +1,12 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:imagePicker="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".MainActivity">
+
+    <item
+        android:id="@+id/action_done"
+        android:icon="@drawable/ic_action_done_white"
+        android:title="@string/action_done"
+        android:visible="false"
+        imagePicker:showAsAction="always" />
+</menu>

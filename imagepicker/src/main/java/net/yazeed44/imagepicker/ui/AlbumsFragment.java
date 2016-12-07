@@ -212,7 +212,7 @@ public class AlbumsFragment extends Fragment implements RequestListener<ArrayLis
             }
         }
 
-        ((PickerActivity) getActivity()).updateFab();
+        ((PickerActivity) getActivity()).updateDoneOption();
 
     }
 

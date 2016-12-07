@@ -68,8 +68,10 @@ public class ImagesThumbnailFragment extends Fragment {
     }
 
 
-    public void onEvent(final Events.OnAttachFabEvent fabEvent) {
-        fabEvent.fab.attachToRecyclerView(mImagesRecycler);
+    public void onEvent(final Events.OnAttachDoneOptionEvent doneOptionEvent) {
+        if (doneOptionEvent.fab != null) {
+            doneOptionEvent.fab.attachToRecyclerView(mImagesRecycler);
+        }
     }
 
     public void onEvent(final Events.OnUpdateImagesThumbnailEvent redrawImage) {

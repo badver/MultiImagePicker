@@ -1,5 +1,7 @@
 package net.yazeed44.imagepicker.util;
 
+import android.view.MenuItem;
+
 import com.melnykov.fab.FloatingActionButton;
 
 import net.yazeed44.imagepicker.model.AlbumEntry;
@@ -41,11 +43,18 @@ public final class Events {
         }
     }
 
-    public final static class OnAttachFabEvent {
+    public final static class OnAttachDoneOptionEvent {
         public final FloatingActionButton fab;
+        public final MenuItem menuItem;
 
-        public OnAttachFabEvent(FloatingActionButton fab) {
+        public OnAttachDoneOptionEvent(FloatingActionButton fab) {
             this.fab = fab;
+            this.menuItem = null;
+        }
+
+        public OnAttachDoneOptionEvent(MenuItem menuItem) {
+            this.menuItem = menuItem;
+            this.fab = null;
         }
     }
 

@@ -17,5 +17,6 @@
     <string name="dialog_choose_camera_title">Choose camera</string>
     <string name="dialog_choose_camera_item_0">Photo camera</string>
     <string name="dialog_choose_camera_item_1">Video camera</string>
+    <string name="action_done">Done</string>
 
 </resources>

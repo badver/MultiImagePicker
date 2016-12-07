@@ -26,6 +26,7 @@ public final class Picker {
 
     public final int limit;
     public final Context context;
+    public final boolean shouldShowDoneFab;
     public final int fabBackgroundColor;
     public final int fabBackgroundColorWhenPressed;
     public final int imageBackgroundColorWhenChecked;
@@ -54,6 +55,7 @@ public final class Picker {
     private Picker(final Builder builder) {
         context = builder.mContext;
         limit = builder.mLimit;
+        shouldShowDoneFab = builder.mShouldShowDoneFab;
         fabBackgroundColor = builder.mFabBackgroundColor;
         fabBackgroundColorWhenPressed = builder.mFabBackgroundColorWhenPressed;
         imageBackgroundColorWhenChecked = builder.mImageBackgroundColorWhenChecked;
@@ -109,6 +111,7 @@ public final class Picker {
         private final PickListener mPickListener;
         private final int mThemeResId;
         private int mLimit = PickerActivity.NO_LIMIT;
+        private boolean mShouldShowDoneFab;
         private int mFabBackgroundColor;
         private int mFabBackgroundColorWhenPressed;
         private int mImageBackgroundColorWhenChecked;
@@ -172,7 +175,8 @@ public final class Picker {
             mCaptureItemIconTintColor = mDoneFabIconTintColor = Util.getDefaultIconTintColor(mContext);
 
             mShouldShowCaptureMenuItem = true;
-            mShouldShowSelectAllMenuItem =true;
+            mShouldShowSelectAllMenuItem = true;
+            mShouldShowDoneFab = true;
 
             mCheckIconTintColor = Color.WHITE;
             mVideosEnabled = false;
@@ -274,6 +278,11 @@ public final class Picker {
 
         public Picker.Builder disableSelectAllOption() {
             mShouldShowSelectAllMenuItem = false;
+            return this;
+        }
+
+        public Picker.Builder shouldShowDoneFab(boolean shouldShowDoneFab) {
+            mShouldShowDoneFab = shouldShowDoneFab;
             return this;
         }
 

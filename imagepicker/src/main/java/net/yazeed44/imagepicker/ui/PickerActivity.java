@@ -61,6 +61,7 @@ public class PickerActivity extends AppCompatActivity {
     private AlbumEntry mSelectedAlbum;
     private MenuItem mSelectAllMenuItem;
     private MenuItem mDeselectAllMenuItem;
+    private MenuItem mDoneMenuItem;
 
     private Toolbar mToolbar;
 
@@ -80,8 +81,8 @@ public class PickerActivity extends AppCompatActivity {
         addToolbarToLayout();
         initActionbar(savedInstanceState);
         setupAlbums(savedInstanceState);
-        initFab();
-        updateFab();
+        initDoneOption();
+        updateDoneOption();
     }
 
     @Override
@@ -113,7 +114,6 @@ public class PickerActivity extends AppCompatActivity {
     protected void onStart() {
         EventBus.getDefault().register(this);
         super.onStart();
-
     }
 
     @Override
@@ -122,10 +122,7 @@ public class PickerActivity extends AppCompatActivity {
         super.onStop();
     }
 
-
     private void initActionbar(final Bundle savedInstanceState) {
-
-
         if (savedInstanceState == null) {
             mShouldShowUp = mPickOptions.backBtnInMainActivity;
             getSupportActionBar().setDisplayHomeAsUpEnabled(mPickOptions.backBtnInMainActivity);
@@ -134,26 +131,27 @@ public class PickerActivity extends AppCompatActivity {
             mShouldShowUp = savedInstanceState.getBoolean(KEY_SHOULD_SHOW_ACTIONBAR_UP);
             getSupportActionBar().setDisplayHomeAsUpEnabled(mShouldShowUp && mPickOptions.backBtnInMainActivity);
             getSupportActionBar().setTitle(savedInstanceState.getString(KEY_ACTION_BAR_TITLE));
-
-
         }
-
-
     }
 
-    public void initFab() {
+    public void initDoneOption() {
+        mDoneFab = (com.melnykov.fab.FloatingActionButton) findViewById(R.id.fab_done);
+
+        if (!mPickOptions.shouldShowDoneFab) {
+            mDoneFab.setVisibility(View.GONE);
+            EventBus.getDefault().postSticky(new Events.OnAttachDoneOptionEvent(mDoneMenuItem));
+            return;
+        }
+
         Drawable doneIcon = ContextCompat.getDrawable(this, R.drawable.ic_action_done_white);
         doneIcon = DrawableCompat.wrap(doneIcon);
         DrawableCompat.setTint(doneIcon, mPickOptions.doneFabIconTintColor);
 
-        mDoneFab = (com.melnykov.fab.FloatingActionButton) findViewById(R.id.fab_done);
         mDoneFab.setImageDrawable(doneIcon);
         mDoneFab.setColorNormal(mPickOptions.fabBackgroundColor);
         mDoneFab.setColorPressed(mPickOptions.fabBackgroundColorWhenPressed);
 
-        EventBus.getDefault().postSticky(new Events.OnAttachFabEvent(mDoneFab));
-
-
+        EventBus.getDefault().postSticky(new Events.OnAttachDoneOptionEvent(mDoneFab));
     }
 
     public void setupAlbums(Bundle savedInstanceState) {
@@ -171,33 +169,42 @@ public class PickerActivity extends AppCompatActivity {
     }
 
 
-    public void updateFab() {
+    public void updateDoneOption() {
 
         if (mPickOptions.pickMode == Picker.PickMode.SINGLE_IMAGE) {
-            mDoneFab.setVisibility(View.GONE);
-            mDoneFab.hide();
+            setDoneOptionVisibility(false);
+            if (mPickOptions.shouldShowDoneFab) {
+                mDoneFab.hide();
+            }
             return;
         }
 
-
         if (sCheckedImages.size() == 0) {
-            mDoneFab.setVisibility(View.GONE);
-
+            setDoneOptionVisibility(false);
         } else if (sCheckedImages.size() == mPickOptions.limit) {
 
             //Might change FAB appearance on other version
-            mDoneFab.setVisibility(View.VISIBLE);
-            mDoneFab.show();
-            mDoneFab.bringToFront();
+            setDoneOptionVisibility(true);
+            if (mPickOptions.shouldShowDoneFab) {
+                mDoneFab.show();
+                mDoneFab.bringToFront();
+            }
 
         } else {
-            mDoneFab.setVisibility(View.VISIBLE);
-            mDoneFab.show();
-            mDoneFab.bringToFront();
-
-
+            setDoneOptionVisibility(true);
+            if (mPickOptions.shouldShowDoneFab) {
+                mDoneFab.show();
+                mDoneFab.bringToFront();
+            }
         }
+    }
 
+    private void setDoneOptionVisibility(boolean visible) {
+        if (mPickOptions.shouldShowDoneFab) {
+            mDoneFab.setVisibility(visible ? View.VISIBLE : View.GONE);
+        } else if (mDoneMenuItem != null) {
+            mDoneMenuItem.setVisible(visible);
+        }
     }
 
     public void onClickDone(View view) {
@@ -233,7 +240,7 @@ public class PickerActivity extends AppCompatActivity {
             return;
         }
 
-        if(!mPickOptions.videosEnabled){
+        if (!mPickOptions.videosEnabled) {
             capturePhoto();
             return;
         }
@@ -351,6 +358,11 @@ public class PickerActivity extends AppCompatActivity {
             }
         }
 
+        if (!mPickOptions.shouldShowDoneFab) {
+            getMenuInflater().inflate(R.menu.menu_done, menu);
+            mDoneMenuItem = menu.findItem(R.id.action_done);
+        }
+
         return true;
     }
 
@@ -398,12 +410,12 @@ public class PickerActivity extends AppCompatActivity {
 
         if (itemId == R.id.action_take_photo) {
             startCamera();
-
         } else if (itemId == R.id.action_select_all) {
             selectAllImages();
-
         } else if (itemId == R.id.action_deselect_all) {
             deselectAllImages();
+        } else if (itemId == R.id.action_done) {
+            onClickDone(findViewById(R.id.fab_done));
         }
 
         return super.onOptionsItemSelected(item);
@@ -419,7 +431,7 @@ public class PickerActivity extends AppCompatActivity {
         EventBus.getDefault().post(new Events.OnUpdateImagesThumbnailEvent());
 
         hideDeselectAll();
-        updateFab();
+        updateDoneOption();
 
     }
 
@@ -448,7 +460,7 @@ public class PickerActivity extends AppCompatActivity {
             }
         }
         EventBus.getDefault().post(new Events.OnUpdateImagesThumbnailEvent());
-        updateFab();
+        updateDoneOption();
 
         if (shouldShowDeselectAll()) {
             showDeselectAll();
@@ -476,7 +488,8 @@ public class PickerActivity extends AppCompatActivity {
             if (mSelectedAlbum == null) {
                 mSelectedAlbum = EventBus.getDefault().getStickyEvent(Events.OnClickAlbumEvent.class).albumEntry;
             }
-            mDoneFab.setVisibility(View.GONE);
+
+            setDoneOptionVisibility(false);
             getSupportFragmentManager().popBackStack(ImagesThumbnailFragment.TAG, 0);
             getSupportActionBar().setTitle(mSelectedAlbum.name);
             getSupportActionBar().show();
@@ -584,7 +597,6 @@ public class PickerActivity extends AppCompatActivity {
     }
 
 
-
     public void onEvent(final Events.OnClickAlbumEvent albumEvent) {
         mSelectedAlbum = albumEvent.albumEntry;
 
@@ -656,8 +668,11 @@ public class PickerActivity extends AppCompatActivity {
 
         }
 
-
-        updateFab();
+        if (!mPickOptions.shouldShowDoneFab && mPickOptions.pickMode == Picker.PickMode.SINGLE_IMAGE) {
+            setDoneOptionVisibility(true);
+        } else {
+            updateDoneOption();
+        }
 
     }
 
@@ -666,7 +681,7 @@ public class PickerActivity extends AppCompatActivity {
         sCheckedImages.remove(unpickImageEvent.imageEntry);
         unpickImageEvent.imageEntry.isPicked = false;
 
-        updateFab();
+        updateDoneOption();
         hideDeselectAll();
     }
 
@@ -683,8 +698,6 @@ public class PickerActivity extends AppCompatActivity {
     public void onEvent(final Events.OnHidingToolbarEvent hidingToolbarEvent) {
         handleToolbarVisibility(false);
     }
-
-
 
 
 }

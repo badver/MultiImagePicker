@@ -7,7 +7,9 @@ import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -29,6 +31,7 @@ public class ImagesPagerFragment extends Fragment implements PhotoViewAttacher.O
     protected ViewPager mImagePager;
     protected AlbumEntry mSelectedAlbum;
     protected FloatingActionButton mDoneFab;
+    protected MenuItem mDoneMenuItem;
 
     @Nullable
     @Override
@@ -78,26 +81,41 @@ public class ImagesPagerFragment extends Fragment implements PhotoViewAttacher.O
         super.onPause();
         EventBus.getDefault().unregister(this);
 
-        mDoneFab.hide();
+        if (mDoneFab != null) {
+            mDoneFab.hide();
+        } else if (mDoneMenuItem != null) {
+            mDoneMenuItem.setVisible(false);
+        }
     }
 
     @Override
     public void onViewTap(View view, float x, float y) {
 
 
-        if (mDoneFab.isVisible()) {
+        boolean isDoneOptionVisible = false;
+        if (mDoneFab != null) isDoneOptionVisible = mDoneFab.isVisible();
+        else if (mDoneMenuItem != null) isDoneOptionVisible = mDoneMenuItem.isVisible();
+
+        if (isDoneOptionVisible) {
             //Hide everything expect the image
             EventBus.getDefault().post(new Events.OnHidingToolbarEvent());
-            mDoneFab.hide();
-
+            if (mDoneFab != null) {
+                mDoneFab.hide();
+            } else if (mDoneMenuItem != null) {
+                mDoneMenuItem.setVisible(false);
+            }
 
         } else {
             //Show fab and actionbar
             EventBus.getDefault().post(new Events.OnShowingToolbarEvent());
-            mDoneFab.setVisibility(View.VISIBLE);
-            mDoneFab.show();
-            mDoneFab.bringToFront();
 
+            if (mDoneFab != null) {
+                mDoneFab.setVisibility(View.VISIBLE);
+                mDoneFab.show();
+                mDoneFab.bringToFront();
+            } else if (mDoneMenuItem != null) {
+                mDoneMenuItem.setVisible(true);
+            }
         }
 
     }
@@ -131,9 +149,14 @@ public class ImagesPagerFragment extends Fragment implements PhotoViewAttacher.O
 
     public void onEvent(final Events.OnPickImageEvent pickImageEvent) {
 
-        mDoneFab.setVisibility(View.VISIBLE);
-        mDoneFab.show();
-        mDoneFab.bringToFront();
+        if (mDoneFab != null) {
+            mDoneFab.setVisibility(View.VISIBLE);
+            mDoneFab.show();
+            mDoneFab.bringToFront();
+        } else if (mDoneMenuItem != null) {
+            mDoneMenuItem.setVisible(true);
+        }
+
         if (mImagePager.getAdapter() != null) {
             return;
         }
@@ -151,8 +174,9 @@ public class ImagesPagerFragment extends Fragment implements PhotoViewAttacher.O
         mSelectedAlbum = albumEvent.albumEntry;
     }
 
-    public void onEvent(final Events.OnAttachFabEvent fabEvent) {
-        mDoneFab = fabEvent.fab;
+    public void onEvent(final Events.OnAttachDoneOptionEvent doneOptionEvent) {
+        mDoneFab = doneOptionEvent.fab;
+        mDoneMenuItem = doneOptionEvent.menuItem;
     }
 
 
